@@ -26,7 +26,6 @@ FONT_MAP = {
     "body": (("--f-body", 'Georgia, "Times New Roman", serif'),),
     "scrawl": (("--f-marker", '"Marker Felt", "Comic Sans MS", cursive'), ("--f-script", '"Snell Roundhand", cursive')),
 }
-MOTIF_TO_MASTHEAD = {"front-page": "newspaper", "magazine-scrawl": "magazine"}
 FONT_NAME = re.compile(r"^[A-Za-z0-9 ]{2,40}$")
 
 
@@ -70,11 +69,12 @@ def apply_style(cfg: dict, style: dict, words: bool = True) -> dict:
     handle or lines on someone else's zine.
     """
     lines = style.get("lines") or {}
-    masthead = MOTIF_TO_MASTHEAD.get(style.get("motif", ""))
-    if masthead:
-        cfg.setdefault("masthead", masthead)
+    # magazine-scrawl makes the magazine cover; every other motif (or none) the newspaper
+    cfg.setdefault("masthead", "magazine" if style.get("motif") == "magazine-scrawl" else "newspaper")
     if not words:
         return cfg
+    if cfg["masthead"] == "magazine" and lines.get("magazine"):
+        cfg.setdefault("zine_name", lines["magazine"])
     for key, value in (("zine_name", lines.get("masthead")), ("cover_line", lines.get("headline")),
                        ("scrawl", lines.get("scrawl")), ("author", style.get("owner")), ("handle", style.get("handle"))):
         if value:

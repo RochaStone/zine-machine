@@ -31,11 +31,12 @@ Anything you set in `zine.config.json` (zine name, cover line, palette) wins ove
 | `fonts.body` | a readable text face | the posts |
 | `fonts.scrawl` | a marker or handwriting face | scrawls, pull quotes, notes |
 | `fonts.mono` | a typewriter face | not used by the zine |
-| `motif` | your signature look | `front-page` makes newspaper covers, `magazine-scrawl` makes magazine covers; anything else keeps the newspaper |
+| `motif` | your signature look | `magazine-scrawl` makes magazine covers; every other motif makes the newspaper cover. `masthead` in zine.config.json overrides it |
 | `lines.masthead` | the name across the top | the zine name, unless you give one |
 | `lines.headline` | your big line | the cover headline, unless you give one |
 | `lines.scrawl` | your handwritten line | the magazine scrawl, unless you give one |
-| `lines.todo`, `stamp`, `celebrate`, `affirm` | more of your lines | used by other tools |
+| `lines.magazine` | your magazine masthead | the magazine cover name, unless you give one |
+| `lines.todo`, `stamp`, `celebrate`, `affirm`, `invite` | more of your lines | used by other tools |
 | `references` | images or links that show your taste | your Claude looks at these when making your style file |
 | `notes` | your look in a sentence | your Claude reads this |
 

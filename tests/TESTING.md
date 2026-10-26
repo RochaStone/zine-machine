@@ -14,7 +14,7 @@ Standard library only. No pytest needed.
 - `test_render_smoke.py`: a full build of the example into a temp folder, checking 8 pages in the screen PDF, 1 page in the print PDF, eight 1080 x 1920 story PNGs and a 1600 x 900 preview. Skipped with a clear reason when no browser is found. The HTML-only build runs everywhere.
 
 ## What was run (26 Oct 2026, macOS, Python 3.12.8, Google Chrome 156)
-- Full suite: 52 tests, all passing, about 20 to 45 seconds.
+- Full suite: 53 tests, all passing, about 20 to 45 seconds.
 - Smoke test with the browser faked as missing: skipped with its reason, the HTML-only test still passed.
 - Example built with `--renderer playwright` (Playwright driving the installed Chrome) and with `--renderer chrome` (Chrome's own headless print and screenshot). Both gave:
 

@@ -13,7 +13,7 @@ SECOND = {
     "name": "Sea Glass", "owner": "Mara Quill", "handle": "@maraquill",
     "palette": {"hero": "#0F7B6C", "paper": "#EEF4F0", "ink": "#1B2A2F"},
     "fonts": {"masthead": "Cormorant Garamond", "body": "Lora"},
-    "motif": "front-page",
+    "motif": "guest-check",
     "lines": {"masthead": "THE TIDE LINE", "headline": "Slow mornings, bright ideas"},
 }
 
@@ -76,6 +76,17 @@ class StyleTest(unittest.TestCase):
         flat = json.dumps(cfg) + json.dumps(merged["lines"])
         for theirs in ("ROCHEVERSE", "FOUNDER WORLD", "@rocheverse", "Rocha"):
             self.assertNotIn(theirs, flat)
+
+    def test_motif_picks_cover_and_config_wins(self):
+        self.assertEqual(zine.load_config(None, SECOND)[0]["masthead"], "newspaper")   # guest-check
+        self.assertEqual(zine.load_config(None, {})[0]["masthead"], "newspaper")       # no motif
+        mag = {**SECOND, "motif": "magazine-scrawl", "lines": {"magazine": "TIDE"}}
+        cfg, _ = zine.load_config(None, mag)
+        self.assertEqual((cfg["masthead"], cfg["zine_name"]), ("magazine", "TIDE"))
+        with tempfile.TemporaryDirectory() as d:
+            p = Path(d) / "zine.config.json"
+            p.write_text(json.dumps({"masthead": "newspaper"}), encoding="utf-8")
+            self.assertEqual(zine.load_config(p, mag)[0]["masthead"], "newspaper")
 
     def test_lookup_order(self):
         with tempfile.TemporaryDirectory() as d:
