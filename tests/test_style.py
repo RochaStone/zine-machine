@@ -58,6 +58,25 @@ class StyleTest(unittest.TestCase):
         self.assertEqual(cfg["zine_name"], "My Own Name")
         self.assertEqual(cfg["handle"], "@maraquill")
 
+    def test_user_style_inherits_only_palette_and_fonts(self):
+        user = {"name": "", "owner": "", "handle": "", "palette": {"hero": "#0F7B6C", "ink": ""},
+                "fonts": {"body": "Lora"}, "lines": {"masthead": "", "headline": ""}, "references": [], "notes": ""}
+        merged = style.inherit(user, self.rocha)
+        self.assertEqual(merged["palette"]["hero"], "#0F7B6C")             # hers kept
+        self.assertEqual(merged["palette"]["ink"], self.rocha["palette"]["ink"])  # missing colour borrowed
+        self.assertEqual(merged["fonts"]["body"], "Lora")
+        self.assertEqual(merged["fonts"]["masthead"], self.rocha["fonts"]["masthead"])
+        for key in ("name", "owner", "handle", "references", "notes"):
+            self.assertEqual(merged[key], user[key], key)
+        self.assertEqual(merged["lines"], user["lines"])
+        cfg, _ = zine.load_config(None, merged, style_words=True)
+        self.assertEqual(cfg["zine_name"], style.NEUTRAL_MASTHEAD)
+        self.assertNotIn("cover_line", cfg)
+        self.assertEqual(cfg["handle"], "")
+        flat = json.dumps(cfg) + json.dumps(merged["lines"])
+        for theirs in ("ROCHEVERSE", "FOUNDER WORLD", "@rocheverse", "Rocha"):
+            self.assertNotIn(theirs, flat)
+
     def test_lookup_order(self):
         with tempfile.TemporaryDirectory() as d:
             d = Path(d)

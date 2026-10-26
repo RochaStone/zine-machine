@@ -50,6 +50,19 @@ def load_style(path: Path) -> tuple[dict, list[str]]:
     return (data if isinstance(data, dict) else {}), []
 
 
+NEUTRAL_MASTHEAD = "YOUR WORDS HERE"
+
+
+def inherit(user: dict, example: dict) -> dict:
+    """A user's style borrows only missing palette colours and fonts from the example.
+    Lines, owner, handle, name, references and notes never fall back to Rocha's."""
+    merged = {k: v for k, v in user.items() if k not in ("palette", "fonts")}
+    for key in ("palette", "fonts"):
+        mine = {k: v for k, v in (user.get(key) or {}).items() if v}
+        merged[key] = {**(example.get(key) or {}), **mine}
+    return merged
+
+
 def apply_style(cfg: dict, style: dict, words: bool = True) -> dict:
     """Fill zine settings from the style. Anything set in zine.config.json wins.
 

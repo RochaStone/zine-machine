@@ -43,8 +43,9 @@ def load_config(path: Path | None, style_data: dict | None = None, style_words: 
     if cfg["masthead"] not in ("newspaper", "magazine"):
         warnings.append(f"masthead '{cfg['masthead']}' unknown, using newspaper")
         cfg["masthead"] = "newspaper"
-    # the house mastheads, used only when the person gives no zine name of their own
-    cfg.setdefault("zine_name", "THE ROCHEVERSE TIMES" if cfg["masthead"] == "newspaper" else "ROCHEVERSE")
+    # the house mastheads, only when no personal style exists; a personal style never falls back to her words
+    house = "THE ROCHEVERSE TIMES" if cfg["masthead"] == "newspaper" else "ROCHEVERSE"
+    cfg.setdefault("zine_name", house if not style_words else style.NEUTRAL_MASTHEAD)
     cfg.setdefault("date", pages.default_date())
     cfg.setdefault("author", "")
     cfg.setdefault("handle", "")
@@ -66,6 +67,9 @@ def build(args) -> int:
         print(err)
         return 2
     style_data, warnings = style.load_style(style_path)
+    if style_path != style.BUNDLED:
+        example, _ = style.load_style(style.BUNDLED)
+        style_data = style.inherit(style_data, example)
     cfg, w = load_config(Path(args.config) if args.config else None, style_data, style_path != style.BUNDLED)
     warnings += w
     style_css, cfg["_font_links"], w = style.css_and_fonts(style_data)

@@ -8,7 +8,7 @@ Zine Machine looks for it in this order and uses the first it finds:
 3. `~/.rocha-coded/style.json` (one file for every tool on this computer)
 4. `examples/style.rocha-coded.json`, Rocha's own look, shipped as the example
 
-Start from [style.example.json](style.example.json). Leave anything blank to keep the example's value.
+Start from [style.example.json](style.example.json). A blank colour or font borrows the example's. Your words never do: a blank name, handle or line stays blank, and a zine with no name of its own says YOUR WORDS HERE until you give it one.
 Anything you set in `zine.config.json` (zine name, cover line, palette) wins over the style file for that one zine.
 
 | Key | What it is | How Zine Machine uses it |
