@@ -16,7 +16,7 @@ from .layout import CONTENT_PAGES, TOTAL_PAGES, imposition
 TEMPLATES = Path(__file__).resolve().parent.parent / "templates"
 FONTS = ("https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@500;700"
          "&family=Bodoni+Moda:ital,wght@0,400..900;1,400..900&family=Fraunces:ital,wght@0,400..900;1,400..900"
-         "&family=Newsreader:ital,wght@0,400;0,600;1,400&family=Permanent+Marker&display=swap")
+         "&family=Newsreader:ital,wght@0,400;0,600;1,400&family=Permanent+Marker&family=Caveat:wght@700&display=swap")
 
 PALETTE = {
     "hot": "#FF2D8A", "candy": "#FFB3D1", "pink-paper": "#FFE1EC", "cream": "#F6EFE4", "ink": "#111111",
@@ -71,8 +71,8 @@ def plain(text: str) -> str:
     return html.escape(re.sub(r"(\*\*|\*|__|_)", "", text), quote=True)
 
 
-def palette_vars(overrides: dict | None) -> tuple[str, list[str]]:
-    pal, warnings = dict(PALETTE), []
+def palette_vars(overrides: dict | None, only_overrides: bool = False) -> tuple[str, list[str]]:
+    pal, warnings, changed = dict(PALETTE), [], {}
     for key, value in (overrides or {}).items():
         name = PALETTE_ALIASES.get(key.replace("-", "_"), key.replace("_", "-"))
         if name not in pal:
@@ -80,7 +80,9 @@ def palette_vars(overrides: dict | None) -> tuple[str, list[str]]:
         elif not isinstance(value, str) or not HEX.match(value):
             warnings.append(f"palette: '{key}' must look like #FF2D8A, ignored")
         else:
-            pal[name] = value
+            pal[name] = changed[name] = value
+    if only_overrides:
+        return (":root{" + "".join(f"--{k}:{v};" for k, v in changed.items()) + "}") if changed else "", warnings
     css = ":root{" + "".join(f"--{k}:{v};" for k, v in pal.items()) + f'--grain:url("{grain_png()}");' + "}"
     return css, warnings
 
@@ -105,13 +107,14 @@ def cover_newspaper(cfg: dict, posts, layout: dict) -> str:
     quote_box = (f'<div class="qotd"><span class="inside-h">Quote of the day</span><p>{plain(quote)}</p></div>'
                  if quote else "")
     inside = "".join(f"<li><b>{p}</b><span>{plain(t)}</span></li>" for p, t in contents(posts, layout)[:6])
-    mast = _fit_size(name, ((14, "44pt"), (20, "36pt"), (28, "28pt"), (999, "23pt")))
+    mast = _fit_size(name, ((14, "44pt"), (18, "34pt"), (22, "29pt"), (30, "24pt"), (999, "20pt")))
     head = _fit_size(headline, ((30, "32pt"), (55, "26pt"), (90, "21pt"), (999, "18pt")))
     byline = " · ".join(x for x in (cfg.get("author"), cfg.get("handle")) if x)
+    dateline = ", ".join(x for x in (cfg.get("place"), cfg["date"]) if x)
     return f"""<section class="page cover news" style="--mast-size:{mast};--head-size:{head}">
 <div class="ear"><span>Vol. 1 · No. {html.escape(str(cfg.get('issue', 1)))}</span><span>Free · Pass it on</span></div>
 <h1 class="masthead">{plain(name)}</h1>
-<div class="dateline"><span>{html.escape(cfg['date'])}</span><span>{html.escape(byline)}</span></div>
+<div class="dateline"><span>{html.escape(dateline)}</span><span>{html.escape(byline)}</span></div>
 <div class="kicker">BREAKING NEWS</div>
 <h2 class="headline">{plain(headline)}</h2>
 <div class="cols"><div><p class="teaser">{plain(teaser)}</p><p class="more">read it all on page 2</p></div>
@@ -123,22 +126,22 @@ def cover_newspaper(cfg: dict, posts, layout: dict) -> str:
 
 def cover_magazine(cfg: dict, posts, layout: dict) -> str:
     name = cfg["zine_name"]
-    first = (cfg.get("author") or "you").split()[0].upper()
-    scrawl = cfg.get("scrawl") or f"OH {first}!"
+    titles = contents(posts, layout)
+    scrawl = cfg.get("scrawl") or (titles[0][1].lower() if titles else name.lower())
+    spine = cfg.get("spine") or [t for _, t in titles[:4]]
     lead = cfg.get("cover_line") or (posts[0].title if posts else "")
-    rest = contents(posts, layout)[1:4]
+    rest = titles[1:4]
     lines = f'<div class="line lead">{plain(lead)}</div>' if lead else ""
     lines += "".join(f'<div class="line">{plain(t)}<small>page {p}</small></div>' for p, t in rest)
-    mast = _fit_size(name, ((6, "84pt"), (10, "62pt"), (16, "46pt"), (24, "34pt"), (999, "27pt")))
-    scrawl_size = _fit_size(scrawl, ((12, "40pt"), (20, "30pt"), (999, "23pt")))
-    scrawl_top = _fit_size(name, ((6, "36mm"), (10, "32mm"), (16, "40mm"), (999, "46mm")))
-    swash = ('<svg viewBox="0 0 200 20" preserveAspectRatio="none" aria-hidden="true">'
-             '<path d="M4 14 C50 2 120 4 196 10" fill="none" stroke="var(--red)" stroke-width="5" stroke-linecap="round"/></svg>')
-    return f"""<section class="page cover mag" style="--mast-size:{mast};--scrawl-size:{scrawl_size};--scrawl-top:{scrawl_top}">
+    mast = _fit_size(name, ((6, "72pt"), (8, "56pt"), (10, "48pt"), (14, "38pt"), (20, "28pt"), (999, "22pt")))
+    scrawl_size = _fit_size(scrawl, ((16, "40pt"), (26, "32pt"), (40, "25pt"), (999, "20pt")))
+    spine_html = " / ".join(plain(x) for x in spine)
+    return f"""<section class="page cover mag" style="--mast-size:{mast};--scrawl-size:{scrawl_size}">
+<div class="spine"><span>{spine_html}</span></div>
 <div class="issue"><span>Issue {html.escape(str(cfg.get('issue', 1)).zfill(2))}</span><span>{html.escape(cfg['date'])}</span></div>
 <h1 class="title">{plain(name)}</h1>
-<div class="scrawl">{plain(scrawl)}{swash}</div>
 <div class="art">{stickers.HEART}{stickers.BUTTERFLY}{stickers.EVIL_EYE}{stickers.SEVENS}{stickers.SPARKLE}</div>
+<div class="scrawl">{plain(scrawl)}</div>
 <div class="lines">{lines}</div>
 <div class="handle">{html.escape(cfg.get('handle', ''))}</div>
 </section>"""
@@ -218,12 +221,13 @@ def build_pages(cfg: dict, posts, layout: dict) -> dict[int, str]:
 def document(body: str, title: str, cfg: dict, css_vars: str, body_class: str = "") -> str:
     css = (TEMPLATES / "zine.css").read_text(encoding="utf-8")
     scale = cfg.get("_type_scale", 1)
+    extra_fonts = "".join('<link rel="stylesheet" href="%s">' % html.escape(u) for u in cfg.get("_font_links", []))
     return f"""<!doctype html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{plain(title)}</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="{FONTS}">
+<link rel="stylesheet" href="{FONTS}">{extra_fonts}
 <style>{css}
 {css_vars}
 :root{{--type-scale:{scale};}}</style></head>
@@ -290,4 +294,4 @@ def preview_doc(cover_html: str, cfg: dict, css_vars: str) -> str:
 
 def default_date() -> str:
     d = date.today()
-    return f"{d:%A} {d.day} {d:%B %Y}"
+    return f"{d:%A}, {d:%B} {d.day}, {d.year}"

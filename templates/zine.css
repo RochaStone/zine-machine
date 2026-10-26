@@ -8,6 +8,7 @@
   --f-label: "Archivo Narrow", "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
   --f-body: "Newsreader", Georgia, "Times New Roman", serif;
   --f-marker: "Permanent Marker", "Marker Felt", "Comic Sans MS", cursive;
+  --f-script: "Caveat", "Snell Roundhand", "Brush Script MT", cursive;
   /* --grain (a paper-noise tile) and the palette colours are injected by zinelib/pages.py */
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -121,38 +122,41 @@ body { color: var(--ink); font-family: var(--f-body); }
 .news .stk-heart { width: 26mm; right: 9mm; bottom: 10mm; transform: rotate(12deg); }
 .news .stk-777 { width: 24mm; right: 32mm; bottom: 8mm; transform: rotate(-8deg); }
 
-/* ---------- cover: magazine with marker scrawl ---------- */
-.mag { padding: 9mm 10mm; background-color: var(--pink-paper); color: var(--ink); }
-.mag::before { content: ""; position: absolute; right: -18mm; top: 58mm; width: 120mm; height: 120mm; border-radius: 50%;
-  background: var(--candy); }
+/* ---------- cover: magazine, black Didone masthead, pink script up the side ---------- */
+.mag { padding: 9mm 16mm 9mm 17mm; background-color: var(--white); color: var(--ink); }
+.mag::before { content: ""; position: absolute; right: -14mm; top: 62mm; width: 112mm; height: 112mm; border-radius: 50%;
+  background: var(--pink-paper); }
+.mag .spine { position: absolute; left: 0; top: 0; bottom: 0; width: 10mm; background: var(--hot); }
+.mag .spine span { position: absolute; left: 5mm; bottom: 8mm; transform-origin: 0 0; transform: rotate(-90deg) translateY(-50%);
+  white-space: nowrap; font-family: var(--f-label); font-weight: 700; font-size: 7.5pt; letter-spacing: .2em;
+  text-transform: uppercase; color: var(--white); }
 .mag .issue { position: relative; display: flex; justify-content: space-between; font-family: var(--f-label); font-weight: 700;
   letter-spacing: .2em; font-size: 9pt; text-transform: uppercase; }
 .mag .title {
   position: relative; font-family: var(--f-didone); font-weight: 900; text-transform: uppercase; text-align: center;
-  font-size: var(--mast-size, 64pt); line-height: .86; letter-spacing: -.03em; margin-top: 3mm; color: var(--hot);
-  text-shadow: 1mm 1mm 0 var(--plum);
+  font-size: var(--mast-size, 56pt); line-height: .9; letter-spacing: -.02em; margin-top: 3mm; color: var(--ink);
+  border-bottom: .6mm solid var(--ink); padding-bottom: 2mm;
 }
 .mag .scrawl {
-  position: absolute; left: 6mm; right: 6mm; top: var(--scrawl-top, 33mm); text-align: center;
-  font-family: var(--f-marker); color: var(--red); font-size: var(--scrawl-size, 34pt); line-height: 1;
-  transform: rotate(-9deg); text-shadow: 0 0 .5mm var(--red), .6mm .6mm 0 var(--white);
+  position: absolute; right: 2.5mm; bottom: 14mm; transform-origin: 100% 100%; transform: rotate(-90deg) translateX(100%);
+  white-space: nowrap; font-family: var(--f-script); font-weight: 700; color: var(--hot);
+  font-size: var(--scrawl-size, 36pt); line-height: 1; text-shadow: .5mm .5mm 0 var(--white);
 }
-.mag .scrawl svg { display: block; margin: -1mm auto 0; width: 70%; height: 8mm; }
-.mag .lines { position: absolute; left: 10mm; bottom: 12mm; width: 64mm; }
+.mag .lines { position: absolute; left: 17mm; bottom: 12mm; width: 62mm; }
 .mag .lines .line { font-family: var(--f-label); font-weight: 700; text-transform: uppercase; letter-spacing: .06em;
   font-size: 12pt; line-height: 1.08; margin-top: 3.4mm; color: var(--ink); }
 .mag .lines .line small { display: block; font-family: var(--f-body); font-style: italic; text-transform: none;
   letter-spacing: 0; font-weight: 400; font-size: 10pt; color: var(--hot); }
-.mag .lines .lead { font-family: var(--f-didone); font-style: italic; font-weight: 800; font-size: 24pt; line-height: .98;
+.mag .lines .lead { font-family: var(--f-didone); font-style: italic; font-weight: 800; font-size: 22pt; line-height: 1;
   text-transform: none; letter-spacing: -.01em; color: var(--plum); margin-bottom: 2mm; }
-.mag .art { position: absolute; right: 4mm; top: 62mm; width: 84mm; height: 104mm; }
+.mag .art { position: absolute; right: 16mm; top: 58mm; width: 76mm; height: 100mm; }
 .mag .art .stk { position: absolute; }
-.mag .art .stk-heart { width: 64mm; right: 8mm; top: 22mm; transform: rotate(-8deg); }
-.mag .art .stk-fly { width: 38mm; left: 0; top: 4mm; transform: rotate(-16deg); }
-.mag .art .stk-eye { width: 22mm; right: 2mm; top: 0; transform: rotate(6deg); }
-.mag .art .stk-777 { width: 34mm; right: 6mm; top: 80mm; transform: rotate(7deg); }
-.mag .art .stk-sparkle { width: 13mm; left: 8mm; top: 62mm; }
-.mag .handle { position: absolute; right: 10mm; bottom: 9mm; font-family: var(--f-label); font-weight: 700;
+.mag .art .stk-heart { width: 56mm; right: 6mm; top: 22mm; transform: rotate(-8deg); }
+.mag .art .stk-fly { width: 34mm; left: 0; top: 4mm; transform: rotate(-16deg); }
+.mag .art .stk-eye { width: 20mm; right: 0; top: 0; transform: rotate(6deg); }
+.mag .art .stk-777 { width: 30mm; right: 4mm; top: 76mm; transform: rotate(7deg); }
+.mag .art .stk-sparkle { width: 12mm; left: 6mm; top: 58mm; }
+.mag .handle { position: absolute; right: 16mm; bottom: 9mm; font-family: var(--f-label); font-weight: 700;
   letter-spacing: .18em; font-size: 9pt; }
 
 /* ---------- back cover ---------- */

@@ -20,38 +20,48 @@ Five short posts of 60 to 120 words each is the sweet spot. Pages 2 to 7 hold ro
 
 **Their words stay theirs.** If there is too much, do not paraphrase or cut inside a sentence. Show them which whole sentences or paragraphs you suggest keeping, get a yes, and save the trimmed files as new copies.
 
-## 2. Ask, in one short message
-1. **Zine name** (the masthead). Example: The Good Times News.
+## 2. Their look: style.json
+Look for `style.json` in the working folder, then `~/.rocha-coded/style.json`. If there is one, use it. Its colours, fonts, cover style and lines (name, handle, masthead, headline, scrawl) style the zine, and you can skip asking for anything it already answers.
+
+If the user has no style.json, offer to make one: ask for 3 to 5 references (screenshots, links, a Pinterest board), a palette if she has one, and the words she says a lot. Look at the references. Write `style.json` in the working folder using the keys in `<skill>/style.example.json` (explained in `<skill>/STYLE.md`). Show her one rendered sample, the cover, and adjust once. Never assume her taste is Rocha's.
+
+If she says no, the bundled example look is used (`<skill>/examples/style.rocha-coded.json`). Only its colours and fonts carry over. Her own name and words go on her zine.
+
+## 3. Ask, in one short message
+1. **Zine name** (the masthead). Example: THE ROCHEVERSE TIMES.
 2. **Cover style:** **Newspaper front page** (masthead, dateline, BREAKING NEWS, two columns) or **Magazine cover** (huge serif title with a red marker scrawl across it).
 3. **Their name and handle** for the cover and the back page.
-4. Optional: a cover line, the scrawl text for the magazine style (default "OH <FIRST NAME>!"), a line for the back cover, and palette changes.
+4. Optional: a cover line, the scrawl text for the magazine style (it runs up the side of the cover), a line for the back cover, and a place for the dateline.
 
-## 3. Write `zine.config.json` in the working folder
+## 4. Write `zine.config.json` in the working folder
 ```json
 {
-  "zine_name": "The Good Times News",
+  "zine_name": "THE ROCHEVERSE TIMES",
   "author": "Their Name",
   "handle": "@theirhandle",
   "masthead": "newspaper",
-  "cover_line": "Local founder does it her way, again",
-  "scrawl": "OH HONEY!",
+  "cover_line": "What if your founder world works out?",
+  "scrawl": "build your founder world",
+  "place": "New York City",
   "back_note": "Keep it, gift it, leave it in a cafe.",
   "issue": 1,
-  "date": "Monday 26 October 2026",
+  "date": "Monday, October 26, 2026",
   "paper": "alternate",
   "palette": {}
 }
 ```
+- Settings here win over style.json for this one zine.
 - `masthead`: `newspaper` or `magazine`.
 - `paper`: `alternate` (pink lined and cream), `pink`, or `cream`.
 - `palette` keys, all optional, hex only: `hot_pink`, `candy_pink`, `pale_pink`, `cream`, `ink`, `marker_red`, `plum`, `gold`, `pale_blue`, `white`.
 - Leave out anything they did not give. `date` defaults to today.
 
-## 4. Build
+## 5. Build
 From the working folder, with `<skill>` being the folder this SKILL.md is in:
 ```bash
 python3 <skill>/zine.py check
 python3 <skill>/zine.py build <posts or folder or links> --config zine.config.json --out out/
+# add --style path/to/style.json if it lives somewhere else
 ```
 Read what it prints:
 - "type set at N%" means it resized the type to fill the pages. Fine.
@@ -59,7 +69,7 @@ Read what it prints:
 - "pages ... became Notes pages" means there were too few words. Fine for a handout, or add a post.
 - "No PDFs this time" means no browser was found. The HTML pages in `out/html/` are complete; tell them to open `zine-print.html` in Chrome or Safari and Print, Save as PDF, Landscape, Margins none, Background graphics on. To get PDFs automatically, install Google Chrome, or run `pip install playwright` then `python3 -m playwright install chromium`, and build again.
 
-## 5. Hand it over
+## 6. Hand it over
 Show them `out/preview.png` and tell them where everything is:
 - `out/zine-print.pdf`: the one sheet to print. Point them to `<skill>/templates/FOLDING.md` for the cut and fold.
 - `out/zine-screen.pdf`: the eight pages in reading order, for email or DMs.

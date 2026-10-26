@@ -8,7 +8,7 @@ Paste five posts or voice notes. Get a mini zine you can print on one sheet, fol
 
 ## What you get
 - **A zine on one sheet of paper.** Print it, cut one line, fold it. Eight little pages, in the right order, every time.
-- **A cover with attitude.** A newspaper front page ("BREAKING NEWS", dateline, two columns) or a magazine cover with a red marker scrawl across the title.
+- **A cover with attitude.** A newspaper front page ("BREAKING NEWS", dateline, two columns) or a magazine cover with a big serif masthead and a pink scrawl running up the side.
 - **Pink lined paper, cream paper, ink and stickers.** Hearts, an evil eye, 777, butterflies. Drawn in, nothing borrowed.
 - **The same zine for screens.** An eight page PDF to email or DM, and eight Instagram stories, one per page.
 - **Your words, exactly as you wrote them.** It never rewrites a sentence. If there is too much, it asks which whole sentences to keep.
@@ -95,26 +95,35 @@ Copy [examples/zine.config.json](examples/zine.config.json) to start your config
 `--renderer` picks how pages become PDFs: `auto` (Playwright if it is installed, else Chrome directly), `chrome`,
 `playwright`, or `html` for no browser at all. If Chrome lives somewhere unusual, set `ZINE_CHROME` to its path.
 
+## Make it yours
+One `style.json` holds your colours, fonts, cover style and the lines you say a lot. Put it in your zine folder, or in `~/.rocha-coded/` to use it everywhere. Your Claude can make it with you from a few references.
+Two examples ship with it: [examples/style.rocha-coded.json](examples/style.rocha-coded.json) is Rocha's own look, and [style.example.json](style.example.json) is the blank one to fill in. [STYLE.md](STYLE.md) explains every key.
+The same file works across every Rocha Coded tool, so you make your look once.
+
 ## What's inside
 - `SKILL.md`: the steps your Claude follows.
+- `style.example.json` and `STYLE.md`: your look, in one file.
 - `zine.py`: the one command. Python standard library only.
 - `zinelib/`: reading posts (markdown, text, Substack pages), flowing words onto pages, the fold order, the pages
   themselves, the stickers, and the browser that prints them.
 - `templates/zine.css`: the whole look. Fonts come from Google Fonts with system fallbacks.
 - `templates/FOLDING.md`: how to cut and fold.
-- `examples/`: five posts by a made-up potter, and the zine they make in both cover styles.
+- `examples/`: five posts by a made-up potter, Rocha's style file, and the zine they make in both cover styles.
 - `tests/`: the page flow and fold order tests, plus a full build. See [tests/TESTING.md](tests/TESTING.md).
-
-## Made by
-This didn't exist, so I built it.
-
-[Rocha](https://thrivingera.com)<br>
-Brand Alchemist & AI Architect<br>
-Author of Brand Alchemy in the Thriving Era<br>
-Creator of [Conscious Founder OS](https://founders.thrivingera.com)<br>
-Founder, Thriving Era Studio
-
-Instagram [@rocheverse](https://instagram.com/rocheverse) · Substack [rochastone.substack.com](https://rochastone.substack.com)
 
 ## Licence
 MIT. Copyright (c) 2026 Rochelle Livingstone / Thriving Era Studio. See [LICENSE](LICENSE).
+
+## Made by Rocha
+
+Rocha \
+Brand Alchemist & AI Architect \
+Author of *Brand Alchemy in the Thriving Era* \
+Creator of [Conscious Founder OS](https://founders.thrivingera.com) \
+Founder, [Thriving Era Studio](https://thrivingera.com)
+
+I take female founders AI native in 7 days, and I build what they need next. \
+Start with the audit: [thrivingera.com/audit](https://thrivingera.com/audit). \
+Or book an exploratory call: [calendly.com/rochelle-thrivingera/exploratory-call](https://calendly.com/rochelle-thrivingera/exploratory-call). It is where we decide if we work together.
+
+[Instagram @rocheverse](https://instagram.com/rocheverse) · [Substack](https://rochastone.substack.com) · [LinkedIn](https://www.linkedin.com/in/rochellelivingstonecosmic) · [More free tools](https://thrivingera.com/free) · [All tools on GitHub](https://github.com/RochaStone)

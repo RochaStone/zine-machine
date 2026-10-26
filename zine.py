@@ -20,7 +20,7 @@ if sys.version_info < (3, 10):
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from zinelib import inputs, layout, pages  # noqa: E402
+from zinelib import inputs, layout, pages, style  # noqa: E402
 from zinelib.browser import RenderError, find_chrome, get_renderer  # noqa: E402
 
 STORY_W, STORY_H = 1080, 1920
@@ -28,7 +28,7 @@ PREVIEW_W, PREVIEW_H = 1600, 900
 REQUIRED = ("zine_name",)
 
 
-def load_config(path: Path | None) -> tuple[dict, list[str]]:
+def load_config(path: Path | None, style_data: dict | None = None, style_words: bool = True) -> tuple[dict, list[str]]:
     cfg: dict = {}
     if path:
         try:
@@ -38,11 +38,13 @@ def load_config(path: Path | None) -> tuple[dict, list[str]]:
         except json.JSONDecodeError as err:
             sys.exit(f"config is not valid JSON ({path}): {err}")
     warnings = []
-    cfg.setdefault("zine_name", "The Good Times News")
+    style.apply_style(cfg, style_data or {}, style_words)
     cfg.setdefault("masthead", "newspaper")
     if cfg["masthead"] not in ("newspaper", "magazine"):
         warnings.append(f"masthead '{cfg['masthead']}' unknown, using newspaper")
         cfg["masthead"] = "newspaper"
+    # the house mastheads, used only when the person gives no zine name of their own
+    cfg.setdefault("zine_name", "THE ROCHEVERSE TIMES" if cfg["masthead"] == "newspaper" else "ROCHEVERSE")
     cfg.setdefault("date", pages.default_date())
     cfg.setdefault("author", "")
     cfg.setdefault("handle", "")
@@ -58,7 +60,17 @@ def write(path: Path, text: str) -> Path:
 
 
 def build(args) -> int:
-    cfg, warnings = load_config(Path(args.config) if args.config else None)
+    try:
+        style_path = style.find_style(args.style)
+    except FileNotFoundError as err:
+        print(err)
+        return 2
+    style_data, warnings = style.load_style(style_path)
+    cfg, w = load_config(Path(args.config) if args.config else None, style_data, style_path != style.BUNDLED)
+    warnings += w
+    style_css, cfg["_font_links"], w = style.css_and_fonts(style_data)
+    warnings += w
+    print(f"style: {style_path.name}" + (" (the bundled example)" if style_path == style.BUNDLED else ""))
     posts, w = inputs.collect(args.inputs)
     warnings += w
     if not posts:
@@ -70,7 +82,9 @@ def build(args) -> int:
     capacity = int(cfg.get("words_per_page", layout.CAPACITY))
     result, scale = layout.fit(posts, capacity)
     cfg["_type_scale"] = round(scale, 3)
-    css_vars, w = pages.palette_vars(cfg.get("palette"))
+    base_css, _ = pages.palette_vars({})
+    override_css, w = pages.palette_vars(cfg.get("palette"), only_overrides=True)
+    css_vars = base_css + style_css + override_css  # zine.config.json palette beats style.json
     warnings += w
 
     out = Path(args.out)
@@ -148,6 +162,7 @@ def main(argv=None) -> int:
     b = sub.add_parser("build", help="make the zine")
     b.add_argument("inputs", nargs="+", help="markdown or .txt files, a folder, or public Substack post links")
     b.add_argument("--config", help="zine.config.json")
+    b.add_argument("--style", help="style.json (default: ./style.json, ~/.rocha-coded/style.json, then the bundled example)")
     b.add_argument("--out", default="out", help="output folder (default: out)")
     b.add_argument("--renderer", default="auto", choices=("auto", "playwright", "chrome", "html"))
     b.add_argument("--no-stories", action="store_true", help="skip the Instagram story PNGs")
