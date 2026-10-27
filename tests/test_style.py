@@ -36,13 +36,13 @@ class StyleTest(unittest.TestCase):
         self.assertIn("THE ROCHEVERSE TIMES", a)
         self.assertIn("THE TIDE LINE", b)
         self.assertNotIn("THE ROCHEVERSE TIMES", b)
-        self.assertIn("--hot:#0F7B6C", b)
+        self.assertIn("--ground:#0F7B6C", b)
         self.assertIn("--cream:#EEF4F0", b)
         self.assertNotIn("#0F7B6C", a)
         self.assertIn("Slow mornings, bright ideas", b)
         self.assertIn("@maraquill", b)
         self.assertIn("family=Cormorant+Garamond", b)
-        self.assertIn('--f-mast:"Cormorant Garamond"', b)
+        self.assertIn('--f-display:"Cormorant Garamond"', b)
 
     def test_bundled_example_never_puts_rochas_words_on_your_zine(self):
         cfg, _ = zine.load_config(None, self.rocha, style_words=False)

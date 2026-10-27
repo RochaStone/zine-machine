@@ -1,1 +1,1 @@
-"""Zine Machine internals: inputs, layout, pages, stickers, browser."""
+"""Zine Machine internals: inputs, layout, pages, style, browser."""

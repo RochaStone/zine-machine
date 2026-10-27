@@ -10,21 +10,22 @@ import zlib
 from datetime import date
 from pathlib import Path
 
-from . import stickers
 from .layout import CONTENT_PAGES, TOTAL_PAGES, imposition
 
 TEMPLATES = Path(__file__).resolve().parent.parent / "templates"
-FONTS = ("https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@500;700"
-         "&family=Bodoni+Moda:ital,wght@0,400..900;1,400..900&family=Fraunces:ital,wght@0,400..900;1,400..900"
-         "&family=Newsreader:ital,wght@0,400;0,600;1,400&family=Permanent+Marker&family=Caveat:wght@700&display=swap")
+FONTS = ("https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..900;1,9..144,400..900"
+         "&family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=DM+Mono:wght@400;500"
+         "&family=Pinyon+Script&family=Permanent+Marker&display=swap")
 
+# The current Rocheverse (v2). "ground" is style.json's palette.hero: the dark ground, not an accent.
 PALETTE = {
-    "hot": "#FF2D8A", "candy": "#FFB3D1", "pink-paper": "#FFE1EC", "cream": "#F6EFE4", "ink": "#111111",
-    "red": "#E0202E", "plum": "#4A1033", "gold": "#D4A64A", "blue": "#BFD4EA", "white": "#FFFFFF",
+    "ground": "#50163C", "wine": "#682047", "ink": "#3B1230", "cream": "#FFF7F4", "blush": "#FFE3F1",
+    "accent": "#FE9DCA", "marker": "#C2246E", "gold": "#E9B949", "cool": "#B9B3F5", "plum": "#50163C",
 }
 PALETTE_ALIASES = {
-    "hot_pink": "hot", "candy_pink": "candy", "pale_pink": "pink-paper", "pink_paper": "pink-paper",
-    "cream_paper": "cream", "marker_red": "red", "gold_sparkle": "gold", "pale_blue": "blue",
+    "hero": "ground", "paper": "cream", "paper_pink": "blush", "pale_pink": "blush", "pink_paper": "blush",
+    "cream_paper": "cream", "candy_pink": "accent", "hot_pink": "ground", "marker_red": "marker",
+    "magenta": "marker", "pale_blue": "cool",
 }
 HEX = re.compile(r"^#[0-9A-Fa-f]{6}$")
 
@@ -33,7 +34,7 @@ def grain_png(size: int = 96, seed: int = 7) -> str:
     """A small tile of ink-coloured noise as a PNG data URI. One tile repeats across every page,
     so the PDF stays small (an SVG noise filter gets rasterised per page and bloats it)."""
     rng = random.Random(seed)
-    rows = b"".join(b"\x00" + bytes(v for _ in range(size) for v in (17, 10, 14, rng.choice((0, 0, 0, 6, 12, 20)))) for _ in range(size))
+    rows = b"".join(b"\x00" + bytes(v for _ in range(size) for v in (59, 18, 48, rng.choice((0, 0, 0, 5, 10, 16)))) for _ in range(size))
     def chunk(tag: bytes, data: bytes) -> bytes:
         return struct.pack(">I", len(data)) + tag + data + struct.pack(">I", zlib.crc32(tag + data) & 0xFFFFFFFF)
     png = b"\x89PNG\r\n\x1a\n" + chunk(b"IHDR", struct.pack(">IIBBBBB", size, size, 8, 6, 0, 0, 0)) \
@@ -78,7 +79,7 @@ def palette_vars(overrides: dict | None, only_overrides: bool = False) -> tuple[
         if name not in pal:
             warnings.append(f"palette: unknown colour '{key}', ignored (known: {', '.join(PALETTE)})")
         elif not isinstance(value, str) or not HEX.match(value):
-            warnings.append(f"palette: '{key}' must look like #FF2D8A, ignored")
+            warnings.append(f"palette: '{key}' must look like #50163C, ignored")
         else:
             pal[name] = changed[name] = value
     if only_overrides:
@@ -102,9 +103,9 @@ def cover_newspaper(cfg: dict, posts, layout: dict) -> str:
     headline = cfg.get("cover_line") or (posts[0].title if posts else name)
     first_text = next((b.text for b in (posts[0].blocks if posts else []) if b.kind == "p"), "")
     words = re.sub(r"(\*\*|\*|__|_)", "", first_text).split()
-    teaser = " ".join(words[:60]) + (" …" if len(words) > 60 else "")
+    teaser = " ".join(words[:95]) + (" …" if len(words) > 95 else "")
     quote = cfg.get("cover_quote") or next((b.text for p in posts for b in p.blocks if b.kind == "quote"), "")
-    quote_box = (f'<div class="qotd"><span class="inside-h">Quote of the day</span><p>{plain(quote)}</p></div>'
+    quote_box = (f'<div class="qotd"><span class="inside-h">quote of the day</span><p>{plain(quote)}</p></div>'
                  if quote else "")
     inside = "".join(f"<li><b>{p}</b><span>{plain(t)}</span></li>" for p, t in contents(posts, layout)[:6])
     mast = _fit_size(name, ((14, "44pt"), (18, "34pt"), (22, "29pt"), (30, "24pt"), (999, "20pt")))
@@ -112,15 +113,14 @@ def cover_newspaper(cfg: dict, posts, layout: dict) -> str:
     byline = " · ".join(x for x in (cfg.get("author"), cfg.get("handle")) if x)
     dateline = ", ".join(x for x in (cfg.get("place"), cfg["date"]) if x)
     return f"""<section class="page cover news" style="--mast-size:{mast};--head-size:{head}">
-<div class="ear"><span>Vol. 1 · No. {html.escape(str(cfg.get('issue', 1)))}</span><span>Free · Pass it on</span></div>
+<div class="ear"><span>vol. 1 · no. {html.escape(str(cfg.get('issue', 1)))}</span><span>free · pass it on</span></div>
 <h1 class="masthead">{plain(name)}</h1>
 <div class="dateline"><span>{html.escape(dateline)}</span><span>{html.escape(byline)}</span></div>
-<div class="kicker">BREAKING NEWS</div>
+<div class="kicker">breaking news</div>
 <h2 class="headline">{plain(headline)}</h2>
 <div class="cols"><div><p class="teaser">{plain(teaser)}</p><p class="more">read it all on page 2</p></div>
-<div><p class="inside-h">Inside</p><ul class="inside">{inside}</ul></div></div>
+<div><p class="inside-h">inside</p><ul class="inside">{inside}</ul></div></div>
 {quote_box}
-{stickers.SEVENS}{stickers.HEART}
 </section>"""
 
 
@@ -132,15 +132,14 @@ def cover_magazine(cfg: dict, posts, layout: dict) -> str:
     lead = cfg.get("cover_line") or (posts[0].title if posts else "")
     rest = titles[1:4]
     lines = f'<div class="line lead">{plain(lead)}</div>' if lead else ""
-    lines += "".join(f'<div class="line">{plain(t)}<small>page {p}</small></div>' for p, t in rest)
+    lines += "".join(f'<div class="line"><small>p. {p}</small>{plain(t)}</div>' for p, t in rest)
     mast = _fit_size(name, ((6, "72pt"), (8, "56pt"), (10, "48pt"), (14, "38pt"), (20, "28pt"), (999, "22pt")))
     scrawl_size = _fit_size(scrawl, ((16, "40pt"), (26, "32pt"), (40, "25pt"), (999, "20pt")))
     spine_html = " / ".join(plain(x) for x in spine)
     return f"""<section class="page cover mag" style="--mast-size:{mast};--scrawl-size:{scrawl_size}">
 <div class="spine"><span>{spine_html}</span></div>
-<div class="issue"><span>Issue {html.escape(str(cfg.get('issue', 1)).zfill(2))}</span><span>{html.escape(cfg['date'])}</span></div>
+<div class="issue"><span>issue {html.escape(str(cfg.get('issue', 1)).zfill(2))}</span><span>{html.escape(cfg['date'])}</span></div>
 <h1 class="title">{plain(name)}</h1>
-<div class="art">{stickers.HEART}{stickers.BUTTERFLY}{stickers.EVIL_EYE}{stickers.SEVENS}{stickers.SPARKLE}</div>
 <div class="scrawl">{plain(scrawl)}</div>
 <div class="lines">{lines}</div>
 <div class="handle">{html.escape(cfg.get('handle', ''))}</div>
@@ -160,11 +159,11 @@ def contents(posts, layout: dict) -> list[tuple[int, str]]:
 def inner_page(n: int, page: dict, cfg: dict) -> str:
     paper = cfg.get("paper", "alternate")
     tone = {"pink": "paper-pink", "cream": "paper-cream"}.get(paper, "paper-pink" if n % 2 == 0 else "paper-cream")
-    head = f'<div class="tag-row"><span class="tag">{plain(cfg["zine_name"])}</span><span class="tag hot">P. {n}</span></div>'
+    head = f'<div class="tag-row"><span class="tag">{plain(cfg["zine_name"])}</span><span class="pill">p. {n}</span></div>'
     if not page["items"]:
         body = ('<p class="notes-sub">your page</p><p class="notes-head">Notes</p>'
-                '<ul class="todo"><li>make art</li><li>call the girls</li><li>be hot</li><li>pass this on</li></ul>')
-        return f'<section class="page inner {tone}">{head}{body}{stickers.for_page(n)}<div class="folio">{n}</div></section>'
+                '<ul class="todo"><li>make art</li><li>call the girls</li><li>pass this on</li></ul>')
+        return f'<section class="page inner paper-pink notes">{head}{body}<div class="folio">{n}</div></section>'
     parts = []
     if page["continued_from"]:
         parts.append('<p class="cont-from">continued</p>')
@@ -188,7 +187,7 @@ def inner_page(n: int, page: dict, cfg: dict) -> str:
         parts.append("</ul>")
     if page["continues"]:
         parts.append(f'<p class="cont-to">continued on page {n + 1}</p>')
-    return f'<section class="page inner {tone}">{head}{"".join(parts)}{stickers.for_page(n)}<div class="folio">{n}</div></section>'
+    return f'<section class="page inner {tone}">{head}{"".join(parts)}<div class="folio">{n}</div></section>'
 
 
 def back_cover(cfg: dict, posts) -> str:
@@ -198,12 +197,11 @@ def back_cover(cfg: dict, posts) -> str:
         note = quote or "Made by hand, folded by hand, passed hand to hand."
     handle = cfg.get("handle", "")
     return f"""<section class="page back">
-<p class="tag hot pass">Pass it on</p>
+<p class="pill pass">pass it on</p>
 <p class="thanks">thank you for reading</p>
 <p class="note">{plain(note)}</p>
 <div class="who"><p class="handle">{html.escape(handle)}</p><p class="name">{html.escape(cfg.get('author', ''))}</p></div>
 <p class="made">made with Zine Machine</p>
-{stickers.LUCKY}{stickers.BUTTERFLY}{stickers.SPARKLE}{stickers.EVIL_EYE}
 </section>"""
 
 
@@ -253,9 +251,8 @@ def print_doc(pages: dict[int, str], cfg: dict, css_vars: str) -> str:
 def story_doc(n: int, page_html: str, cfg: dict, css_vars: str) -> str:
     tilt = ("-1.6deg", "1.4deg", "-0.8deg", "1.8deg")[n % 4]
     body = f"""<div class="story">
-<div class="top"><span class="tag">{plain(cfg['zine_name'])}</span><span class="tag hot">{n} / {TOTAL_PAGES}</span></div>
+<div class="top"><span class="label">{plain(cfg['zine_name'])}</span><span class="pill">{n} / {TOTAL_PAGES}</span></div>
 <div class="card" style="--tilt:{tilt}">{page_html}</div>
-{stickers.SPARKLE if n % 2 else stickers.HEART}
 <div class="bottom">{'swipe for the next page' if n < TOTAL_PAGES else html.escape(cfg.get('handle') or 'pass it on')}</div>
 </div>"""
     return document(body, f"{cfg['zine_name']} story {n}", cfg, css_vars)
@@ -266,18 +263,18 @@ def sheet_diagram_svg() -> str:
     w, h, cells = 180, 250, []
     for s in imposition():
         x, y = 10 + s["col"] * w, 10 + s["row"] * h
-        fill = "var(--hot)" if s["page"] == 1 else ("var(--candy)" if s["page"] == 8 else "var(--white)")
+        fill = "var(--accent)" if s["page"] == 1 else ("var(--blush)" if s["page"] == 8 else "var(--cream)")
         label_y = y + h / 2 + 30
         rot = f' transform="rotate(180 {x + w / 2} {y + h / 2})"' if s["rotate"] else ""
         name = {1: "COVER", 8: "BACK"}.get(s["page"], f"PAGE {s['page']}")
         cells.append(f'<rect x="{x}" y="{y}" width="{w}" height="{h}" fill="{fill}" stroke="var(--ink)" stroke-width="4"/>'
-                     f'<g{rot}><text x="{x + w / 2}" y="{label_y - 40}" text-anchor="middle" font-family="Bodoni Moda, Didot, serif" '
-                     f'font-weight="800" font-size="84" fill="var(--ink)">{s["page"]}</text>'
-                     f'<text x="{x + w / 2}" y="{label_y + 20}" text-anchor="middle" font-family="Archivo Narrow, Arial Narrow, sans-serif" '
-                     f'font-weight="700" font-size="22" letter-spacing="4" fill="var(--ink)">{name}</text></g>')
-    cut = (f'<line x1="{10 + w}" y1="{10 + h}" x2="{10 + 3 * w}" y2="{10 + h}" stroke="var(--red)" stroke-width="9" stroke-linecap="round"/>'
-           f'<text x="{10 + 2 * w}" y="{h - 6}" text-anchor="middle" font-family="Permanent Marker, Marker Felt, cursive" font-size="34" '
-           f'fill="var(--red)">cut here</text>')
+                     f'<g{rot}><text x="{x + w / 2}" y="{label_y - 40}" text-anchor="middle" font-family="Fraunces, Georgia, serif" '
+                     f'font-weight="900" font-size="84" fill="var(--ink)">{s["page"]}</text>'
+                     f'<text x="{x + w / 2}" y="{label_y + 20}" text-anchor="middle" font-family="DM Mono, Menlo, monospace" '
+                     f'font-weight="500" font-size="22" letter-spacing="2" fill="var(--ink)">{name.lower()}</text></g>')
+    cut = (f'<line x1="{10 + w}" y1="{10 + h}" x2="{10 + 3 * w}" y2="{10 + h}" stroke="var(--marker)" stroke-width="7" stroke-linecap="round"/>'
+           f'<text x="{10 + 2 * w}" y="{h - 6}" text-anchor="middle" font-family="Pinyon Script, Snell Roundhand, cursive" font-size="44" '
+           f'fill="var(--marker)">cut here</text>')
     return f'<svg viewBox="0 0 {20 + 4 * w} {20 + 2 * h}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Fold one sheet layout">{"".join(cells)}{cut}</svg>'
 
 
@@ -285,9 +282,9 @@ def preview_doc(cover_html: str, cfg: dict, css_vars: str) -> str:
     body = f"""<div class="preview">
 <div class="card">{cover_html}</div>
 <h1>One sheet. Eight pages.</h1>
-<div class="scrawl">fold it!</div>
+<div class="scrawl">fold it</div>
 <div class="diagram">{sheet_diagram_svg()}</div>
-<p class="caption">Print on one A4 sheet. Cut the red line. Fold. Hand it to someone.</p>
+<p class="caption">Print on one A4 sheet. Cut the pink line. Fold. Hand it to someone.</p>
 </div>"""
     return document(body, f"{cfg['zine_name']} preview", cfg, css_vars)
 

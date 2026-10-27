@@ -25,7 +25,7 @@ Standard library only. No pytest needed.
 | `stories/page-01.png` to `page-08.png` | 1080 x 1920 each |
 | `preview.png` | 1600 x 900 |
 
-- Fonts checked with `pdffonts`: with the bundled style, Playfair Display, Newsreader, Archivo Narrow and Permanent Marker are embedded from Google Fonts.
+- Fonts checked with `pdffonts`: with the bundled style, Fraunces, Bricolage Grotesque, DM Mono and Pinyon Script are embedded from Google Fonts.
 - Every page of both PDFs, the preview and the stories were looked at by eye, in both cover styles (THE ROCHEVERSE TIMES front page and the ROCHEVERSE magazine cover).
 - Two live public Substack posts were read with the Substack reader (titles and body text came out clean). Not part of the suite, because tests stay offline.
 

@@ -14,17 +14,19 @@ ROOT = Path(__file__).resolve().parent.parent
 BUNDLED = ROOT / "examples" / "style.rocha-coded.json"
 HEX = re.compile(r"^#[0-9A-Fa-f]{6}$")
 
-# style.json palette key -> the zine's CSS colour name
+# style.json palette key -> the zine's CSS colour name. "hero" is the GROUND colour (plum), not an accent.
 PALETTE_MAP = {
-    "hero": "hot", "accent": "candy", "paper": "cream", "paper_pink": "pink-paper", "ink": "ink",
-    "marker": "red", "plum": "plum", "gold": "gold", "cool": "blue",
+    "hero": "ground", "accent": "accent", "paper": "cream", "paper_pink": "blush", "ink": "ink",
+    "marker": "marker", "plum": "plum", "wine": "wine", "gold": "gold", "cool": "cool",
 }
-# style.json font key -> CSS font variables it drives, with the system fallbacks kept behind it
+# style.json font key -> CSS font variables it drives, with system fallbacks kept behind it
 FONT_MAP = {
-    "masthead": (("--f-mast", 'Didot, "Bodoni 72", Georgia, serif'), ("--f-didone", 'Didot, "Bodoni 72", Georgia, serif')),
-    "label": (("--f-label", '"Arial Narrow", "Helvetica Neue", Arial, sans-serif'),),
+    "masthead": (("--f-display", 'Georgia, "Times New Roman", serif'),),
+    "label": (("--f-label", '"Helvetica Neue", Arial, sans-serif'),),
     "body": (("--f-body", 'Georgia, "Times New Roman", serif'),),
-    "scrawl": (("--f-marker", '"Marker Felt", "Comic Sans MS", cursive'), ("--f-script", '"Snell Roundhand", cursive')),
+    "scrawl": (("--f-marker", '"Marker Felt", cursive'),),
+    "script": (("--f-script", '"Snell Roundhand", "Apple Chancery", cursive'),),
+    "mono": (("--f-mono", 'Menlo, Consolas, monospace'),),
 }
 FONT_NAME = re.compile(r"^[A-Za-z0-9 ]{2,40}$")
 
@@ -92,7 +94,7 @@ def css_and_fonts(style: dict) -> tuple[str, list[str], list[str]]:
         if isinstance(value, str) and HEX.match(value):
             decls.append(f"--{name}:{value};")
         else:
-            warnings.append(f"style palette '{key}' must look like #FF2D8A, ignored")
+            warnings.append(f"style palette '{key}' must look like #50163C, ignored")
     for key, value in (style.get("fonts") or {}).items():
         if key not in FONT_MAP or not value:
             continue

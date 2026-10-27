@@ -26,12 +26,12 @@ The top row prints upside down. That is on purpose: it lands the right way up on
          fold lines: every edge between panels
 ```
 
-On the PDF the cut is the solid red line marked CUT. The dashed grey lines are the folds.
+On the PDF the cut is the solid pink line marked CUT. The dashed grey lines are the folds.
 
 ## Fold it
 1. Printed side up. Fold the sheet in half top to bottom, long edges together. Crease hard. Unfold.
 2. Fold it in half left to right, short edges together. Crease. Unfold, then fold each short edge in to meet that centre crease. Crease. Unfold flat. You can see eight panels.
-3. Fold it in half left to right again. Starting at the folded edge, cut along the middle crease to the next crease and no further. That is the red CUT line.
+3. Fold it in half left to right again. Starting at the folded edge, cut along the middle crease to the next crease and no further. That is the pink CUT line.
 4. Unfold. Fold top to bottom again, long edges together, printed side out.
 5. Hold the two short ends and push them towards each other. The cut opens into a diamond, then into a plus shape. Keep pushing until the pages fold flat into a little book.
 6. Turn it so the cover (page 1) is on the front. Crease the spine. Done.

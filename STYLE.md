@@ -17,20 +17,22 @@ Anything you set in `zine.config.json` (zine name, cover line, palette) wins ove
 | `owner` | your name | the byline and the back cover |
 | `handle` | your Instagram or other handle | the cover and the back cover |
 | `site` | your website | not shown in the zine |
-| `palette.hero` | your loudest colour | kicker, page tags, magazine spine, script scrawl |
-| `palette.accent` | a softer partner to the hero | back cover, stickers |
-| `palette.paper` | your main paper colour | newspaper cover and cream pages |
-| `palette.paper_pink` | your second paper | lined pages and the preview |
+| `palette.hero` | your dark ground | the back cover, story and preview backgrounds |
+| `palette.accent` | your one accent | pills and the script on dark grounds |
+| `palette.paper` | your main paper colour | covers and cream pages, and type on dark grounds |
+| `palette.paper_pink` | your second paper | lined pages and the notes page |
 | `palette.ink` | text colour | all text and outlines |
-| `palette.marker` | your marker pen colour | "continued" notes, cut line, pull quotes |
-| `palette.plum` | a deep shade | post titles |
-| `palette.gold` | a metallic accent | the 777 and sparkle stickers |
-| `palette.cool` | a rare cool accent | the evil eye sticker |
+| `palette.marker` | your script and pen colour | the magazine scrawl, pull quotes, "continued" notes, the cut line |
+| `palette.plum` | a deep shade | the magazine spine and back cover |
+| `palette.wine` | a second deep shade | the kicker and page pills, quote of the day |
+| `palette.gold` | a metallic accent | thin hairline rules |
+| `palette.cool` | a rare cool accent | not used by the zine |
 | `fonts.masthead` | a big editorial serif | mastheads and titles |
 | `fonts.label` | a condensed sans | tags and labels |
 | `fonts.body` | a readable text face | the posts |
-| `fonts.scrawl` | a marker or handwriting face | scrawls, pull quotes, notes |
-| `fonts.mono` | a typewriter face | not used by the zine |
+| `fonts.scrawl` | a marker face | the hand-written notes page |
+| `fonts.script` | a signature script | the magazine scrawl and the thank-you line |
+| `fonts.mono` | a typewriter face | datelines, page numbers, small notes |
 | `motif` | your signature look | `magazine-scrawl` makes magazine covers; every other motif makes the newspaper cover. `masthead` in zine.config.json overrides it |
 | `lines.masthead` | the name across the top | the zine name, unless you give one |
 | `lines.headline` | your big line | the cover headline, unless you give one |
@@ -40,4 +42,4 @@ Anything you set in `zine.config.json` (zine name, cover line, palette) wins ove
 | `references` | images or links that show your taste | your Claude looks at these when making your style file |
 | `notes` | your look in a sentence | your Claude reads this |
 
-Colours are hex, like `#FF2D8A`. Fonts are Google Fonts names, like `Playfair Display`. If a font is not on Google Fonts, the page falls back to a similar system font.
+Colours are hex, like `#50163C`. Fonts are Google Fonts names, like `Fraunces`. If a font is not on Google Fonts, the page falls back to a similar system font.

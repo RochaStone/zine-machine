@@ -139,7 +139,7 @@ def build(args) -> int:
     for line in warnings:
         print(f"! {line}")
     print(f"\nDone. In {out}/:")
-    print("  zine-print.pdf    one A4 landscape sheet. Print it, cut the red line, fold (see FOLDING.md)")
+    print("  zine-print.pdf    one A4 landscape sheet. Print it, cut the pink line, fold (see FOLDING.md)")
     print("  zine-screen.pdf   the eight pages in reading order, for sending")
     if stories:
         print("  stories/          page-01.png to page-08.png, 1080 x 1920, for Instagram stories")

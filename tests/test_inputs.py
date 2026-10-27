@@ -114,7 +114,7 @@ class SafetyTest(unittest.TestCase):
 
     def test_palette_only_accepts_hex(self):
         css, warnings = palette_vars({"hot_pink": "#00FF00", "ink": "red;}</style><script>", "lilac": "#C8A2C8"})
-        self.assertIn("--hot:#00FF00", css)
+        self.assertIn("--ground:#00FF00", css)
         self.assertNotIn("<script>", css)
         self.assertEqual(len(warnings), 2)
 
