@@ -15,7 +15,7 @@ from .layout import CONTENT_PAGES, TOTAL_PAGES, imposition
 TEMPLATES = Path(__file__).resolve().parent.parent / "templates"
 FONTS = ("https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..900;1,9..144,400..900"
          "&family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=DM+Mono:wght@400;500"
-         "&family=Pinyon+Script&family=Permanent+Marker&display=swap")
+         "&family=Pinyon+Script&family=Permanent+Marker&family=Silkscreen:wght@400;700&family=Pixelify+Sans:wght@400..700&display=swap")
 
 # The current Rocheverse (v2). "ground" is style.json's palette.hero: the dark ground, not an accent.
 PALETTE = {
@@ -156,14 +156,8 @@ def contents(posts, layout: dict) -> list[tuple[int, str]]:
     return found
 
 
-def inner_page(n: int, page: dict, cfg: dict) -> str:
-    paper = cfg.get("paper", "alternate")
-    tone = {"pink": "paper-pink", "cream": "paper-cream"}.get(paper, "paper-pink" if n % 2 == 0 else "paper-cream")
-    head = f'<div class="tag-row"><span class="tag">{plain(cfg["zine_name"])}</span><span class="pill">p. {n}</span></div>'
-    if not page["items"]:
-        body = ('<p class="notes-sub">your page</p><p class="notes-head">Notes</p>'
-                '<ul class="todo"><li>make art</li><li>call the girls</li><li>pass this on</li></ul>')
-        return f'<section class="page inner paper-pink notes">{head}{body}<div class="folio">{n}</div></section>'
+def page_content(n: int, page: dict) -> str:
+    """The words on one content page, as HTML. Every motif family dresses this same content."""
     parts = []
     if page["continued_from"]:
         parts.append('<p class="cont-from">continued</p>')
@@ -187,7 +181,22 @@ def inner_page(n: int, page: dict, cfg: dict) -> str:
         parts.append("</ul>")
     if page["continues"]:
         parts.append(f'<p class="cont-to">continued on page {n + 1}</p>')
-    return f'<section class="page inner {tone}">{head}{"".join(parts)}<div class="folio">{n}</div></section>'
+    return "".join(parts)
+
+
+def page_titles(page: dict) -> list[str]:
+    return [it["text"] for it in page["items"] if it["kind"] == "title"]
+
+
+def inner_page(n: int, page: dict, cfg: dict) -> str:
+    paper = cfg.get("paper", "alternate")
+    tone = {"pink": "paper-pink", "cream": "paper-cream"}.get(paper, "paper-pink" if n % 2 == 0 else "paper-cream")
+    head = f'<div class="tag-row"><span class="tag">{plain(cfg["zine_name"])}</span><span class="pill">p. {n}</span></div>'
+    if not page["items"]:
+        body = ('<p class="notes-sub">your page</p><p class="notes-head">Notes</p>'
+                '<ul class="todo"><li>make art</li><li>call the girls</li><li>pass this on</li></ul>')
+        return f'<section class="page inner paper-pink notes">{head}{body}<div class="folio">{n}</div></section>'
+    return f'<section class="page inner {tone}">{head}{page_content(n, page)}<div class="folio">{n}</div></section>'
 
 
 def back_cover(cfg: dict, posts) -> str:
@@ -206,7 +215,11 @@ def back_cover(cfg: dict, posts) -> str:
 
 
 def build_pages(cfg: dict, posts, layout: dict) -> dict[int, str]:
-    """All eight pages as HTML fragments, keyed by page number."""
+    """All eight pages as HTML fragments, keyed by page number, in the zine's motif family."""
+    motif = cfg.get("motif", "analog")
+    if motif != "analog":
+        from . import skins  # the cyberpunk and y2k-blog families
+        return skins.build(motif, cfg, posts, layout)
     cover = cover_magazine if cfg.get("masthead") == "magazine" else cover_newspaper
     pages = {1: cover(cfg, posts, layout), TOTAL_PAGES: back_cover(cfg, posts)}
     for n, page in zip(CONTENT_PAGES, layout["pages"]):
@@ -217,7 +230,7 @@ def build_pages(cfg: dict, posts, layout: dict) -> dict[int, str]:
 # ---------------------------------------------------------------- documents
 
 def document(body: str, title: str, cfg: dict, css_vars: str, body_class: str = "") -> str:
-    css = (TEMPLATES / "zine.css").read_text(encoding="utf-8")
+    css = (TEMPLATES / "zine.css").read_text(encoding="utf-8") + (TEMPLATES / "skins.css").read_text(encoding="utf-8")
     scale = cfg.get("_type_scale", 1)
     extra_fonts = "".join('<link rel="stylesheet" href="%s">' % html.escape(u) for u in cfg.get("_font_links", []))
     return f"""<!doctype html>
@@ -242,7 +255,7 @@ def print_doc(pages: dict[int, str], cfg: dict, css_vars: str) -> str:
     for s in imposition():
         left, top = s["col"] * 74.25, s["row"] * 105
         flip = " flip" if s["rotate"] == 180 else ""
-        slots.append(f'<div class="slot{flip}" style="left:{left}mm;top:{top}mm">{pages[s["page"]]}</div>')
+        slots.append(f'<div class="slot{flip}" data-page="{s["page"]}" style="left:{left}mm;top:{top}mm">{pages[s["page"]]}</div>')
     guides = "".join(f'<div class="guide fold-v" style="left:{c * 74.25}mm"></div>' for c in (1, 2, 3))
     guides += '<div class="guide fold-h"></div><div class="guide cut"></div><div class="cut-label">CUT</div>'
     return document(f'<div class="sheet">{"".join(slots)}{guides}</div>', cfg["zine_name"] + " print sheet", cfg, css_vars)

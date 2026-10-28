@@ -31,6 +31,19 @@ FONT_MAP = {
 FONT_NAME = re.compile(r"^[A-Za-z0-9 ]{2,40}$")
 
 
+FAMILIES = ("analog", "cyberpunk", "y2k-blog")
+# older motif names map to the nearest family
+FAMILY_ALIASES = {"retro-tv": "cyberpunk", "sticker-collage": "y2k-blog"}
+
+
+def family(motif: str | None) -> str:
+    """analog | cyberpunk | y2k-blog. Unknown and older motif names fall back to the nearest family."""
+    motif = (motif or "").strip().lower()
+    if motif in FAMILIES:
+        return motif
+    return FAMILY_ALIASES.get(motif, "analog")
+
+
 def find_style(explicit: str | None = None, cwd: Path | None = None) -> Path:
     if explicit:
         p = Path(explicit).expanduser()
@@ -73,6 +86,7 @@ def apply_style(cfg: dict, style: dict, words: bool = True) -> dict:
     lines = style.get("lines") or {}
     # magazine-scrawl makes the magazine cover; every other motif (or none) the newspaper
     cfg.setdefault("masthead", "magazine" if style.get("motif") == "magazine-scrawl" else "newspaper")
+    cfg.setdefault("motif", family(style.get("motif")))
     if not words:
         return cfg
     if cfg["masthead"] == "magazine" and lines.get("magazine"):

@@ -26,6 +26,7 @@ from zinelib.browser import RenderError, find_chrome, get_renderer  # noqa: E402
 STORY_W, STORY_H = 1080, 1920
 PREVIEW_W, PREVIEW_H = 1600, 900
 REQUIRED = ("zine_name",)
+MOTIF_CAPACITY = {"analog": 1.0, "cyberpunk": 0.8, "y2k-blog": 0.72}
 
 
 def load_config(path: Path | None, style_data: dict | None = None, style_words: bool = True) -> tuple[dict, list[str]]:
@@ -83,7 +84,12 @@ def build(args) -> int:
         print("No posts to make a zine from.")
         return 2
 
-    capacity = int(cfg.get("words_per_page", layout.CAPACITY))
+    if args.motif:
+        cfg["motif"] = args.motif
+    cfg["motif"] = style.family(cfg.get("motif"))
+    print(f"motif: {cfg['motif']}")
+    # mono type and a blog sidebar hold fewer words per page than the analog pages
+    capacity = int(cfg.get("words_per_page", layout.CAPACITY * MOTIF_CAPACITY[cfg["motif"]]))
     result, scale = layout.fit(posts, capacity)
     cfg["_type_scale"] = round(scale, 3)
     base_css, _ = pages.palette_vars({})
@@ -168,6 +174,7 @@ def main(argv=None) -> int:
     b.add_argument("--config", help="zine.config.json")
     b.add_argument("--style", help="style.json (default: ./style.json, ~/.rocha-coded/style.json, then the bundled example)")
     b.add_argument("--out", default="out", help="output folder (default: out)")
+    b.add_argument("--motif", choices=style.FAMILIES, help="analog, cyberpunk or y2k-blog (default: from style.json, else analog)")
     b.add_argument("--renderer", default="auto", choices=("auto", "playwright", "chrome", "html"))
     b.add_argument("--no-stories", action="store_true", help="skip the Instagram story PNGs")
     b.set_defaults(func=build)

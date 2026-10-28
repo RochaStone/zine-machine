@@ -48,7 +48,8 @@ If there is no style.json, ask: "Would you like the zine in your own colours and
 ## 4. A few details, one at a time
 Ask each one, reflect it back, then ask the next. Skip any her style file already answers.
 1. "What would you like to call your zine? This goes across the top of the cover." Example: THE ROCHEVERSE TIMES.
-2. "Which cover feels like you: a **newspaper front page** (big masthead, dateline, breaking news, two columns) or a **magazine cover** (huge serif title, a line in script running up the side)?"
+2. "Which look feels like you? **Analog** is paper you could hold. **Cyberpunk** is a girly plum terminal, with a cartridge label on the back. **Y2k-blog** is a 2003 blog page, with windows, a hit counter and a guestbook on the back." Skip this if her style file sets `motif`. Save her answer as `motif`: `analog`, `cyberpunk` or `y2k-blog`.
+   If she picks analog, also ask: "A **newspaper front page** (big masthead, dateline, breaking news, two columns) or a **magazine cover** (huge serif title, a line in script running up the side)?"
 3. "What name and handle should go on the cover and the back page?"
 4. "Is there a line you'd love on the cover? If not, I'll use the title of your first post." For the magazine cover, also ask for the script line up the side.
 5. "Anything for the back cover, like a line to readers or where to find you?" This one is optional.
@@ -61,6 +62,7 @@ Say: "I'm saving your choices in a small settings file called zine.config.json."
   "author": "Her Name",
   "handle": "@herhandle",
   "masthead": "newspaper",
+  "motif": "analog",
   "cover_line": "What if your founder world works out?",
   "scrawl": "build your founder world",
   "place": "New York City",
@@ -73,7 +75,7 @@ Say: "I'm saving your choices in a small settings file called zine.config.json."
 ```
 - Leave out anything she did not give. `date` defaults to today.
 - Settings here win over style.json for this one zine.
-- `masthead`: `newspaper` or `magazine`. `paper`: `alternate` (blush lined and cream), `pink`, or `cream`.
+- `motif`: `analog`, `cyberpunk` or `y2k-blog`. `masthead` (analog only): `newspaper` or `magazine`. `paper`: `alternate` (blush lined and cream), `pink`, or `cream`.
 - `palette` keys, all optional, hex only: `hero` (the dark ground), `accent`, `paper`, `paper_pink`, `ink`, `marker`, `plum`, `wine`, `gold`, `cool`.
 
 ## 6. Make the zine

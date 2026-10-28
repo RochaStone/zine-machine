@@ -33,7 +33,7 @@ Anything you set in `zine.config.json` (zine name, cover line, palette) wins ove
 | `fonts.scrawl` | a marker face | the hand-written notes page |
 | `fonts.script` | a signature script | the magazine scrawl and the thank-you line |
 | `fonts.mono` | a typewriter face | datelines, page numbers, small notes |
-| `motif` | your signature look | `magazine-scrawl` makes magazine covers; every other motif makes the newspaper cover. `masthead` in zine.config.json overrides it |
+| `motif` | your structure: `analog`, `cyberpunk` or `y2k-blog` | which of the three looks the zine is built in. Older names still work (`magazine-scrawl` gives the analog magazine cover, `retro-tv` gives cyberpunk, the rest give analog). `motif` in zine.config.json or `--motif` overrides it |
 | `lines.masthead` | the name across the top | the zine name, unless you give one |
 | `lines.headline` | your big line | the cover headline, unless you give one |
 | `lines.scrawl` | your handwritten line | the magazine scrawl, unless you give one |

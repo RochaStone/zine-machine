@@ -45,6 +45,17 @@ class RenderSmokeTest(unittest.TestCase):
                 self.assertEqual(png_size(out / "stories" / f"page-{n:02d}.png"), (1080, 1920))
             self.assertEqual(png_size(out / "preview.png"), (1600, 900))
 
+    def test_build_every_motif(self):
+        for motif in ("cyberpunk", "y2k-blog"):
+            with tempfile.TemporaryDirectory() as out:
+                proc = subprocess.run(
+                    [sys.executable, str(ROOT / "zine.py"), "build", str(ROOT / "examples" / "input"),
+                     "--config", str(ROOT / "examples" / "zine.config.json"), "--out", out, "--motif", motif, "--no-stories"],
+                    capture_output=True, text=True, timeout=600)
+                self.assertEqual(proc.returncode, 0, proc.stdout + proc.stderr)
+                self.assertEqual(pdf_pages(Path(out) / "zine-screen.pdf"), 8, motif)
+                self.assertEqual(pdf_pages(Path(out) / "zine-print.pdf"), 1, motif)
+
 
 class HtmlOnlyTest(unittest.TestCase):
     def test_html_fallback_needs_no_browser(self):
