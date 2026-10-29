@@ -173,7 +173,7 @@ MIT. Copyright (c) 2026 Rochelle Livingstone / Thriving Era Studio. See [LICENSE
 
 Rocha \
 Brand Alchemist & AI Architect \
-Author of *Brand Alchemy in the Thriving Era* \
+Author of *Brand Alchemy in the Thriving Era* and *Thriving in Transformational Times* \
 Creator of [Conscious Founder Operating System](https://founders.thrivingera.com) \
 Founder, [Thriving Era Studio](https://thrivingera.com)
 
